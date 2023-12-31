@@ -1,0 +1,55 @@
+# Importer les bibliothèques nécessaires
+from transformers import BartForConditionalGeneration, BartTokenizer
+import streamlit as st
+
+
+# Définir la fonction de résumé
+def summarize_text(input_text):
+    model_name = "facebook/bart-large-cnn"
+    try:
+        model = BartForConditionalGeneration.from_pretrained(model_name)
+        tokenizer = BartTokenizer.from_pretrained(model_name)
+
+        inputs = tokenizer.encode("summarize: " + input_text, return_tensors="pt", max_length=1024, truncation=True)
+        summary_ids = model.generate(inputs, max_length=200, min_length=50, length_penalty=2.0, num_beams=4,
+                                     early_stopping=True)
+        summary = tokenizer.decode(summary_ids[0], skip_special_tokens=True)
+        return summary
+    except Exception as e:
+        return f"Une erreur s'est produite : {str(e)}"
+
+
+# Fonction pour afficher la zone d'entrée du texte et générer le résumé
+def generate_summary_ui():
+    st.title("YNWA")
+    st.subheader("Bienvenue chez YNWA (You will Never Walk Alone). Comment puis-je vous aider?")
+
+    # Zone de saisie du texte
+    abstract_text = st.text_area("Entrez votre texte ici:")
+
+    # Bouton pour générer le résumé
+    if st.button("Générer Résumé"):
+        if not abstract_text:
+            st.warning("Veuillez entrer du texte avant de générer un résumé.")
+        else:
+            with st.spinner('En train de générer le résumé...'):
+                summary = summarize_text(abstract_text)
+            st.success('Résumé généré avec succès!')
+            return abstract_text, summary
+    return None, None
+
+
+# Fonction principale
+def main():
+    input_text, summary = generate_summary_ui()
+
+    # Afficher la longueur du texte et le résumé
+    if input_text is not None and summary is not None:
+        st.markdown(f"**Longueur du texte:** {len(input_text)} caractères")
+        st.markdown("### Résumé")
+        st.write(summary)
+        st.markdown(f"**Longueur du résumé:** {len(summary)} caractères")
+
+
+if __name__ == "__main__":
+    main()
