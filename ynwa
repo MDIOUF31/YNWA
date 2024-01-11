@@ -2,7 +2,6 @@
 from transformers import BartForConditionalGeneration, BartTokenizer
 import streamlit as st
 
-
 # Définir la fonction de résumé
 def summarize_text(input_text):
     model_name = "facebook/bart-large-cnn"
@@ -17,7 +16,6 @@ def summarize_text(input_text):
         return summary
     except Exception as e:
         return f"Une erreur s'est produite : {str(e)}"
-
 
 # Fonction pour afficher la zone d'entrée du texte et générer le résumé
 def generate_summary_ui():
@@ -38,18 +36,16 @@ def generate_summary_ui():
             return abstract_text, summary
     return None, None
 
-
 # Fonction principale
 def main():
     input_text, summary = generate_summary_ui()
 
-    # Afficher la longueur du texte et le résumé
+    # Afficher le nombre de mots dans le texte d'origine et dans le résumé
     if input_text is not None and summary is not None:
-        st.markdown(f"**Longueur du texte:** {len(input_text)} caractères")
+        st.markdown(f"**Nombre de mots dans le texte d'origine:** {len(input_text.split())}")
         st.markdown("### Résumé")
         st.write(summary)
-        st.markdown(f"**Longueur du résumé:** {len(summary)} caractères")
-
+        st.markdown(f"**Nombre de mots dans le résumé:** {len(summary.split())}")
 
 if __name__ == "__main__":
     main()
